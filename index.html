@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MOOD BOX</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #f8dce9;
+  background-image:
+    linear-gradient(#f4d6e6 1px, transparent 1px),
+    linear-gradient(90deg,#f4d6e6 1px,transparent 1px);
+  background-size: 30px 30px;
+  color: white;
+}
+
+.window {
+  max-width: 1100px;
+  min-height: 750px;
+  margin: auto;
+  padding: 8px;
+  border: 3px solid #17152c;
+  background: linear-gradient(120deg,#68d8ef,#e89be9,#ffb9d9);
+  box-shadow: 8px 8px 0 #777;
+}
+
+.topbar {
+  background: #17132e;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.logo {
+  font-size: 23px;
+  font-weight: bold;
+  color: #f2baff;
+  letter-spacing: 3px;
+}
+
+nav {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+nav a:hover {
+  color: #ff9ee9;
+}
+
+.content {
+  min-height: 620px;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 80% 30%,#4031a0,transparent 45%),
+    linear-gradient(130deg,#08091e,#17104a,#28217a);
+  padding: 55px 20px;
+  text-align: center;
+}
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
+
+h1 {
+  font-size: clamp(35px,6vw,65px);
+  line-height: 1.4;
+  background: linear-gradient(90deg,#4d9cff,#c58aff,#ff9bdb);
+  color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  color: #e5d9ff;
+  letter-spacing: 3px;
+}
+
+.planet {
+  position: absolute;
+  font-size: 55px;
+  top: 30px;
+  left: 30px;
+}
+
+.star {
+  position: absolute;
+  font-size: 35px;
+  right: 35px;
+  top: 60px;
+  color: #ffcbf5;
+}
+
+.gift {
+  font-size: 130px;
+  margin: 35px;
+  display: inline-block;
+  filter: drop-shadow(0 0 20px #d78aff);
+  animation: floating 3s infinite ease-in-out;
+}
+
+@keyframes floating {
+  50% { transform: translateY(-15px) rotate(5deg); }
+}
+
+.btn {
+  background: linear-gradient(100deg,#ff8bd7,#b77aff);
+  color: white;
+  border: 2px solid #ffd7ff;
+  border-radius: 12px;
+  padding: 15px 30px;
+  font-size: 18px;
+  cursor: pointer;
+  margin: 10px;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+}
+
+h2 {
+  color: #d6a6ff;
+  font-size: 35px;
+}
+
+.description {
+  color: #ded5ff;
+  margin-bottom: 35px;
+}
+
+.moods {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin: 40px auto;
+}
+
+.mood {
+  width: 125px;
+  height: 130px;
+  border: 2px solid #cba5ff;
+  border-radius: 15px;
+  background: linear-gradient(140deg,#7758d9,#409fd1);
+  color: white;
+  cursor: pointer;
+  font-size: 25px;
+}
+
+.mood small {
+  display: block;
+  margin-top: 10px;
+}
+
+.mood.selected {
+  border: 4px solid #ffb6e9;
+  box-shadow: 0 0 20px #ff9bdf;
+}
+
+.cards {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 25px;
+  margin: 40px 0;
+}
+
+.card {
+  width: 180px;
+  height: 250px;
+  border: 3px solid #edcaff;
+  border-radius: 18px;
+  background: linear-gradient(140deg,#d3a8ff,#6750c8);
+  color: white;
+  font-size: 90px;
+  cursor: pointer;
+  box-shadow: 0 10px 25px #0006;
+  transition: .3s;
+}
+
+.card:hover {
+  transform: translateY(-12px) rotate(3deg);
+}
+
+.result-card {
+  width: 220px;
+  padding: 25px;
+  background: #ffffff18;
+  border: 1px solid #d5aaff;
+  border-radius: 15px;
+}
+
+.poster {
+  font-size: 100px;
+  padding: 25px;
+}
+
+footer {
+  background: #17132e;
+  text-align: center;
+  padding: 20px;
+  color: #c9b9e8;
+  font-size: 12px;
+}
+
+@media(max-width:600px) {
+  body { padding: 5px; }
+  .content { padding: 45px 12px; }
+  .mood { width: 105px; }
+  .card { width: 135px; height: 190px; }
+  nav { gap: 10px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="window">
+
+<header class="topbar">
+  <div class="logo">🎬 MOOD BOX</div>
+
+  <nav>
+    <a onclick="go('home')">首頁</a>
+    <a onclick="go('mood')">心情指數</a>
+    <a onclick="go('movie')">電影盲盒</a>
+  </nav>
+</header>
+
+<main class="content">
+
+<div class="planet">🪐</div>
+<div class="star">✦ ✧</div>
+
+<!-- 首頁 -->
+<section id="home" class="page active">
+
+  <p class="subtitle">YOUR PERSONAL MOVIE UNIVERSE</p>
+
+  <h1>
+    今天想看什麼？<br>
+    交給命運決定
+  </h1>
+
+  <p class="description">
+    讓心情決定你的電影，開啟未知的驚喜。
+  </p>
+
+  <div class="gift">🎁</div>
+
+  <br>
+
+  <button class="btn" onclick="go('mood')">
+    開始探索 ➜
+  </button>
+
+</section>
+
+<!-- 心情指數 -->
+<section id="mood" class="page">
+
+  <h2>MOOD INDEX</h2>
+
+  <h1>今天的心情指數？</h1>
+
+  <p class="description">
+    選擇最符合你現在心情的指數
+  </p>
+
+  <div class="moods">
+
+    <button class="mood" onclick="choose(100,this)">
+      😆<small>+100%</small>
+    </button>
+
+    <button class="mood" onclick="choose(70,this)">
+      😁<small>+70%</small>
+    </button>
+
+    <button class="mood" onclick="choose(0,this)">
+      😐<small>0%</small>
+    </button>
+
+    <button class="mood" onclick="choose(-50,this)">
+      🙁<small>-50%</small>
+    </button>
+
+    <button class="mood" onclick="choose(-70,this)">
+      😠<small>-70%</small>
+    </button>
+
+  </div>
+
+  <p id="moodText">請選擇你的心情</p>
+
+  <button class="btn" onclick="nextMovie()">
+    下一步 ➜
+  </button>
+
+</section>
+
+<!-- 電影盲盒 -->
+<section id="movie" class="page">
+
+  <h2>CHOOSE YOUR MOVIE</h2>
+
+  <p class="description">
+    選擇一個神秘盲盒，看看今天的命運電影
+  </p>
+
+  <div class="cards">
+
+    <button class="card" onclick="draw(0)">?</button>
+    <button class="card" onclick="draw(1)">?</button>
+    <button class="card" onclick="draw(2)">?</button>
+
+  </div>
+
+  <p>✦ YOUR MOVIE IS WAITING ✦</p>
+
+</section>
+
+<!-- 結果 -->
+<section id="result" class="page">
+
+  <h2>YOUR MOVIE</h2>
+
+  <div class="result-card" style="margin:auto">
+
+<div class="poster" id="poster">
+  <img id="posterImage" src="" alt="電影海報">
+</div>
+
+    <h2 id="title"></h2>
+
+    <p id="type"></p>
+
+    <p id="desc"></p>
+
+    <p id="reason"></p>
+
+  </div>
+
+  <button class="btn" onclick="go('movie')">
+    再抽一次
+  </button>
+
+  <button class="btn" onclick="go('home')">
+    回首頁
+  </button>
+
+</section>
+
+</main>
+
+<footer>
+  MOOD BOX © 2026
+  <br><br>
+  LET YOUR MOOD CHOOSE YOUR MOVIE
+</footer>
+
+</div>
+
+<script>
+let mood = null;
+
+const database = {
+  100: [
+    ["海底總動員","動畫・冒險","小丑魚爸爸展開尋找兒子的旅程。","今天適合探索世界！","https://image.tmdb.org/t/p/w500/eHuGQ10FUzK1mdOY69wF5pGgEf5.jpg"],
+    ["魔髮奇緣","動畫・奇幻","長髮公主展開尋找自由的冒險。","讓今天充滿驚喜！","https://image.tmdb.org/t/p/w500/ym7Kst6a4uodryxqbGOxmewF235.jpg"],
+    ["史瑞克2","動畫・喜劇","史瑞克與費歐娜展開新的冒險。","今天就開心大笑吧！","https://image.tmdb.org/t/p/w500/2yYP0PQjG8zVqturh1BAqu2Tixl.jpg"]
+  ],
+
+  70: [
+    ["料理鼠王","動畫・喜劇","一隻老鼠追尋料理夢想。","享受生活的小確幸！","https://image.tmdb.org/t/p/w500/npHNjldbeTHdKKw28bJKs7lzqzj.jpg"],
+    ["真愛每一天","愛情・奇幻","一名男子發現自己能夠穿越時空。","珍惜每一天的美好！","https://image.tmdb.org/t/p/w500/4O5bFk8W7k7h7qQ5Q5Q5Q5.jpg"],
+    ["白日夢冒險王","冒險・喜劇","一場找回勇氣與自我的旅程。","今天適合來點冒險！","https://image.tmdb.org/t/p/w500/tY6ypjKOOtujhxiSwTmvA4OZ5IE.jpg"]
+  ],
+
+    0: [
+    ["可可夜總會","動畫・音樂","一位男孩進入神秘的亡靈世界。","感受生命與家人的意義。","https://image.tmdb.org/t/p/w500/gGEsBPAijhVUFoiNpgZXqRVWJt2.jpg"],
+    ["心靈奇旅","動畫・奇幻","重新思考生命與夢想的意義。","發現生活中的小美好。","https://image.tmdb.org/t/p/w500/hm58Jw4Lw8OIeECIq5qyPYhAeRJ.jpg"],
+    ["阿甘正傳","劇情・愛情","一段充滿意外與奇蹟的人生故事。","人生總有意想不到的驚喜。","https://image.tmdb.org/t/p/w500/saHP97rTPS5eLmrLQEcANmKrsFl.jpg"]
+  ],
+
+  "-50": [
+    ["龍貓","動畫・奇幻","兩個女孩遇見森林裡的神奇生物。","讓溫暖陪伴你。","https://image.tmdb.org/t/p/w500/rtGDOeG9LzoerkDGZF9dnVeLppL.jpg"],
+    ["穿著Prada的惡魔","喜劇・劇情","一名女孩進入時尚雜誌工作的故事。","換個角度看看生活！","https://image.tmdb.org/t/p/w500/OfFMqWQDZ4SlLtHiofyRoLjXdX.jpg"],
+    ["刺激1995","劇情・勵志","一段關於友情、自由與希望的故事。","希望永遠都在。","https://image.tmdb.org/t/p/w500/lyQBXzOQSuE59IsHyhrp0qIiPAz.jpg"]
+  ],
+
+  "-70": [
+    ["奇蹟男孩","劇情・家庭","一位男孩勇敢面對生活挑戰。","你值得被溫柔對待。","https://image.tmdb.org/t/p/w500/ouYgAatYH4JzIThj6FI3UYf31RI.jpg"],
+    ["星際效應","科幻・冒險","人類為了尋找新家園展開宇宙旅程。","即使困難，也別放棄希望。","https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg"],
+    ["當幸福來敲門","劇情・勵志","一位父親努力為自己和孩子創造未來。","再辛苦，也請相信自己。","https://image.tmdb.org/t/p/w500/lBYOKAMcxIvuk9s9hMuecB9dPBV.jpg"]
+  ]
+};
+
+function go(id) {
+  document.querySelectorAll(".page").forEach(p=>{
+    p.classList.remove("active");
+  });
+
+  document.getElementById(id).classList.add("active");
+  window.scrollTo(0,0);
+}
+
+function choose(value,button) {
+  mood = value;
+
+  document.querySelectorAll(".mood").forEach(b=>{
+    b.classList.remove("selected");
+  });
+
+  button.classList.add("selected");
+
+  document.getElementById("moodText").textContent =
+    "已選擇心情指數："+value+"%";
+}
+
+function nextMovie() {
+  if(mood === null) {
+    alert("請先選擇心情指數！");
+    return;
+  }
+
+  go("movie");
+}
+
+function draw(index) {
+  const list = database[mood];
+  const movie = list[index];
+
+  document.getElementById("title").textContent=movie[0];
+  document.getElementById("type").textContent=movie[1];
+  document.getElementById("desc").textContent=movie[2];
+  document.getElementById("reason").textContent=
+    "💜 推薦原因："+movie[3];
+
+  document.getElementById("posterImage").src = movie[4];
+
+document.getElementById("posterImage").alt = movie[0];
+  go("result");
+}
+</script>
+<style>
+/* MOOD BOX 星空動畫 */
+.mood-stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+.mood-star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #d9a7ff;
+    animation: twinkle 3s infinite ease-in-out;
+}
+
+@keyframes twinkle {
+    0%, 100% {
+        opacity: 0.2;
+        transform: scale(0.7);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.5);
+    }
+}
+
+.mood-shooting-star {
+    position: absolute;
+    width: 100px;
+    height: 2px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        #fff,
+        #e5b4ff
+    );
+    filter: drop-shadow(0 0 5px #dba5ff);
+    transform: rotate(-35deg);
+    animation: shooting 1.5s linear forwards;
+}
+
+@keyframes shooting {
+    0% {
+        opacity: 0;
+        transform: translate(0, 0) rotate(-35deg);
+    }
+    20% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-250px, 180px) rotate(-35deg);
+    }
+}
+.poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 18px;
+    display: block;
+    box-shadow: 0 0 20px rgba(210, 140, 255, 0.5);
+    animation: posterFade 0.8s ease;
+}
+
+@keyframes posterFade {
+    from {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+</style>
+
+<script>
+const starLayer = document.createElement("div");
+starLayer.className = "mood-stars";
+document.body.appendChild(starLayer);
+
+// 建立星星
+for (let i = 0; i < 75; i++) {
+    const star = document.createElement("div");
+    star.className = "mood-star";
+
+    star.style.left = Math.random() * 100 + "%";
+    star.style.top = Math.random() * 100 + "%";
+    star.style.animationDelay = Math.random() * 4 + "s";
+    star.style.animationDuration = (2 + Math.random() * 3) + "s";
+
+    starLayer.appendChild(star);
+}
+
+// 隨機出現流星
+setInterval(() => {
+    const shooting = document.createElement("div");
+    shooting.className = "mood-shooting-star";
+
+    shooting.style.left = (20 + Math.random() * 80) + "%";
+    shooting.style.top = (Math.random() * 60) + "%";
+
+    starLayer.appendChild(shooting);
+
+    setTimeout(() => shooting.remove(), 1600);
+}, 5000);
+</script>
+</body>
+</html>
